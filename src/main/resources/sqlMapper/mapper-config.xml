@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <typeAliases>
+        <typeAlias alias="aliasMatch" type="com.hunter.bean.Match" />
+        <typeAlias alias="aliasLeague" type="com.hunter.bean.League" />
+        <typeAlias alias="aliasClub" type="com.hunter.bean.Club" />
+        <typeAlias alias="aliasOdds" type="com.hunter.bean.Odds" />
+        <typeAlias alias="aliasBet" type="com.hunter.bean.BetAmount" />
+        <typeAlias alias="aliasMember" type="com.hunter.bean.Member" />
+        <typeAlias alias="aliasHandicap" type="com.hunter.bean.Handicap" />
+    </typeAliases>
+
+    <mappers>
+        <mapper resource="sqlMapper/LotteryMapper.xml" />
+        <mapper resource="sqlMapper/LeagueMapper.xml" />
+        <!--<mapper resource="sqlMapper/MemberInfoMapper.xml" />
+        <mapper resource="sqlMapper/HandicapMapper.xml" />-->
+    </mappers>
+
+</configuration>

@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunter.mapper.LotteryMapper" >
+
+    <resultMap type="aliasMatch" id="MatchResultMap">
+        <id property="id" column="MATCH_ID" />
+        <result property="matchOrder" column="MATCH_ORDER" />
+        <result property="matchNo" column="MATCH_NO" />
+        <result property="matchNoOkooo" column="MATCH_NO_OKOOO" />
+        <result property="matchType" column="MATCH_TYPE" />
+        <result property="homeTeamNo" column="HOME_TEAM_NO" />
+        <result property="guestTeamNo" column="GUEST_TEAM_NO" />
+        <result property="startTime" column="START_TIME" />
+        <result property="homeGoals" column="HOME_GOALS" />
+        <result property="guestGoals" column="GUEST_GOALS" />
+        <result property="halfTimeScore" column="HALF_TIME_SCORE" />
+        <result property="place" column="PLACE" />
+        <result property="weather" column="WEATHER" />
+        <!-- 关联account表 -->
+       <!-- <association property="homeTeam" column="w_acc_id"
+                     javaType="Account" resultMap="joinAccountResult" />
+        <association property="homeTeam" resultMap="LeagueResultMap" />-->
+    </resultMap>
+
+    <resultMap type="aliasOdds" id="OddsResultMap">
+        <id property="id" column="ODDS_ID" />
+        <result property="matchNo" column="MATCH_NO" />
+        <result property="home" column="O_HOME" />
+        <result property="draw" column="O_DRAW" />
+        <result property="away" column="O_AWAY" />
+        <result property="concedePoint" column="CONCEDE_POINT" />
+        <result property="home2" column="O_HOME_2" />
+        <result property="draw2" column="O_DRAW_2" />
+        <result property="away2" column="O_AWAY_2" />
+        <result property="homeBF" column="O_HOME_BF" />
+        <result property="drawBF" column="O_DRAW_BF" />
+        <result property="awayBF" column="O_AWAY_BF" />
+        <result property="publishTime" column="PUBLISH_TIME" />
+    </resultMap>
+
+    <resultMap type="aliasBet" id="BetResultMap">
+        <id property="id" column="BET_ID" />
+        <result property="matchNo" column="MATCH_NO" />
+        <result property="homeAmountBetfair" column="HOME_AMOUNT_BF" />
+        <result property="drawAmountBetfair" column="DRAW_AMOUNT_BF" />
+        <result property="awayAmountBetfair" column="AWAY_AMOUNT_BF" />
+        <result property="homeAmountSporttery" column="HOME_AMOUNT_BF" />
+        <result property="drawAmountSporttery" column="DRAW_AMOUNT_BF" />
+        <result property="awayAmountSporttery" column="AWAY_AMOUNT_BF" />
+        <result property="publishTime" column="PUBLISH_TIME" />
+    </resultMap>
+
+    <sql id="base_cols_match">
+         MATCH_ID,MATCH_ORDER,MATCH_NO,MATCH_NO_OKOOO,MATCH_TYPE,HOME_TEAM_NO,GUEST_TEAM_NO,START_TIME,HOME_GOALS,GUEST_GOALS,HALF_TIME_SCORE,PLACE,WEATHER
+     </sql>
+    <sql id="base_cols_odds">
+        ODDS_ID,MATCH_NO,O_HOME,O_DRAW,O_AWAY,CONCEDE_POINT,O_HOME_2,O_DRAW_2,O_AWAY_2,O_HOME_BF,O_DRAW_BF,O_AWAY_BF,PUBLISH_TIME
+    </sql>
+    <sql id="base_cols_bet_amount">
+        BET_ID,MATCH_NO,HOME_AMOUNT_BF,DRAW_AMOUNT_BF,AWAY_AMOUNT_BF,HOME_AMOUNT_ST,DRAW_AMOUNT_ST,AWAY_AMOUNT_ST,PUBLISH_TIME
+    </sql>
+
+    <select id="selectMatch" parameterType="aliasMatch" resultMap="MatchResultMap">
+        SELECT <include refid="base_cols_match"/>
+        FROM T_MATCH
+        WHERE 1=1
+        <if test="matchOrder != null" >
+            AND MATCH_ORDER = #{matchOrder,jdbcType=VARCHAR}
+        </if>
+        <if test="matchNo != null" >
+            AND MATCH_NO = #{matchNo,jdbcType=VARCHAR}
+        </if>
+        <if test="matchNoOkooo != null" >
+            AND MATCH_NO_OKOOO = #{matchNoOkooo,jdbcType=VARCHAR}
+        </if>
+        <if test="matchType != null" >
+            AND MATCH_TYPE = #{matchType,jdbcType=VARCHAR}
+        </if>
+        <if test="homeTeamNo != null" >
+            AND HOME_TEAM_NO = #{homeTeamNo,jdbcType=VARCHAR}
+        </if>
+        <if test="guestTeamNo != null" >
+            AND GUEST_TEAM_NO = #{guestTeamNo,jdbcType=VARCHAR}
+        </if>
+        <if test="startTime != null" >
+            AND START_TIME = #{startTime,jdbcType=VARCHAR}
+        </if>
+        <if test="homeGoals != null" >
+            AND HOME_GOALS = #{homeGoals,jdbcType=VARCHAR}
+        </if>
+        <if test="guestGoals != null" >
+            AND GUEST_GOALS = #{guestGoals,jdbcType=VARCHAR}
+        </if>
+        <if test="halfTimeScore != null" >
+            AND HALF_TIME_SCORE = #{halfTimeScore,jdbcType=VARCHAR}
+        </if>
+        <if test="place != null" >
+            AND PLACE = #{place,jdbcType=VARCHAR}
+        </if>
+        <if test="weather != null" >
+            AND WEATHER = #{weather,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <insert id="insertMatch" parameterType="aliasMatch" >
+        INSERT INTO T_MATCH
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="matchOrder != null" >
+                MATCH_ORDER,
+            </if>
+            <if test="matchNo != null" >
+                MATCH_NO,
+            </if>
+            <if test="matchNoOkooo != null" >
+                MATCH_NO_OKOOO,
+            </if>
+            <if test="matchType != null" >
+                MATCH_TYPE,
+            </if>
+            <if test="homeTeamNo != null" >
+                HOME_TEAM_NO,
+            </if>
+            <if test="guestTeamNo != null" >
+                GUEST_TEAM_NO,
+            </if>
+            <if test="startTime != null" >
+                START_TIME,
+            </if>
+            <if test="homeGoals != null" >
+                HOME_GOALS,
+            </if>
+            <if test="guestGoals != null" >
+                GUEST_GOALS,
+            </if>
+            <if test="halfTimeScore != null" >
+                HALF_TIME_SCORE,
+            </if>
+            <if test="place != null" >
+                PLACE,
+            </if>
+            <if test="weather != null" >
+                WEATHER,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="matchOrder != null" >
+                #{matchOrder,jdbcType=VARCHAR},
+            </if>
+            <if test="matchNo != null" >
+                #{matchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="matchNoOkooo != null" >
+                #{matchNoOkooo,jdbcType=VARCHAR},
+            </if>
+            <if test="matchType != null" >
+                #{matchType,jdbcType=VARCHAR},
+            </if>
+            <if test="homeTeamNo != null" >
+                #{homeTeamNo,jdbcType=VARCHAR},
+            </if>
+            <if test="guestTeamNo != null" >
+                #{guestTeamNo,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null" >
+                #{startTime,jdbcType=VARCHAR},
+            </if>
+            <if test="homeGoals != null" >
+                #{homeGoals,jdbcType=VARCHAR},
+            </if>
+            <if test="guestGoals != null" >
+                #{guestGoals,jdbcType=VARCHAR},
+            </if>
+            <if test="halfTimeScore != null" >
+                #{halfTimeScore,jdbcType=VARCHAR},
+            </if>
+            <if test="place != null" >
+                #{place,jdbcType=VARCHAR},
+            </if>
+            <if test="weather != null" >
+                #{weather,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateMatch" parameterType="aliasMatch" >
+        UPDATE T_MATCH
+        <set >
+            <if test="matchOrder != null" >
+                MATCH_ORDER = #{matchOrder,jdbcType=VARCHAR},
+            </if>
+            <if test="matchNo != null" >
+                MATCH_NO = #{matchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="matchNoOkooo != null" >
+                MATCH_NO_OKOOO = #{matchNoOkooo,jdbcType=VARCHAR},
+            </if>
+            <if test="matchType != null" >
+                MATCH_TYPE = #{matchType,jdbcType=VARCHAR},
+            </if>
+            <if test="homeTeamNo != null" >
+                HOME_TEAM_NO = #{homeTeamNo,jdbcType=VARCHAR},
+            </if>
+            <if test="guestTeamNo != null" >
+                GUEST_TEAM_NO = #{guestTeamNo,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null" >
+                START_TIME = #{startTime,jdbcType=VARCHAR},
+            </if>
+            <if test="homeGoals != null" >
+                HOME_GOALS = #{homeGoals,jdbcType=VARCHAR},
+            </if>
+            <if test="guestGoals != null" >
+                GUEST_GOALS = #{guestGoals,jdbcType=VARCHAR},
+            </if>
+            <if test="halfTimeScore != null" >
+                HALF_TIME_SCORE = #{guestGoals,jdbcType=VARCHAR},
+            </if>
+            <if test="place != null" >
+                PLACE = #{place,jdbcType=VARCHAR},
+            </if>
+            <if test="weather != null" >
+                WEATHER = #{weather,jdbcType=VARCHAR}
+            </if>
+        </set>
+        WHERE MATCH_ID = #{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertOdds" parameterType="aliasOdds" >
+        INSERT INTO T_ODDS
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="matchNo != null" >
+                MATCH_NO,
+            </if>
+            <if test="home != null" >
+                O_HOME,
+            </if>
+            <if test="draw != null" >
+                O_DRAW,
+            </if>
+            <if test="away != null" >
+                O_AWAY,
+            </if>
+            <if test="concedePoint != null" >
+                CONCEDE_POINT,
+            </if>
+            <if test="home2 != null" >
+                O_HOME_2,
+            </if>
+            <if test="draw2 != null" >
+                O_DRAW_2,
+            </if>
+            <if test="away2 != null" >
+                O_AWAY_2,
+            </if>
+            <if test="homeBF != null" >
+                O_HOME_BF,
+            </if>
+            <if test="drawBF != null" >
+                O_DRAW_BF,
+            </if>
+            <if test="awayBF != null" >
+                O_AWAY_BF,
+            </if>
+            <if test="publishTime != null" >
+                PUBLISH_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="matchNo != null" >
+                #{matchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="home != null" >
+                #{home,jdbcType=DOUBLE},
+            </if>
+            <if test="draw != null" >
+                #{draw,jdbcType=DOUBLE},
+            </if>
+            <if test="away != null" >
+                #{away,jdbcType=DOUBLE},
+            </if>
+            <if test="concedePoint != null" >
+                #{concedePoint,jdbcType=INTEGER},
+            </if>
+            <if test="home2 != null" >
+                #{home2,jdbcType=DOUBLE},
+            </if>
+            <if test="draw2 != null" >
+                #{draw2,jdbcType=DOUBLE},
+            </if>
+            <if test="away2 != null" >
+                #{away2,jdbcType=DOUBLE},
+            </if>
+            <if test="homeBF != null" >
+                #{homeBF,jdbcType=DOUBLE},
+            </if>
+            <if test="drawBF != null" >
+                #{drawBF,jdbcType=DOUBLE},
+            </if>
+            <if test="awayBF != null" >
+                #{awayBF,jdbcType=DOUBLE},
+            </if>
+            <if test="publishTime != null" >
+                #{publishTime,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateOdds" parameterType="aliasOdds" >
+        UPDATE T_ODDS
+        <set >
+            <if test="matchNo != null" >
+                MATCH_NO = #{matchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="home != null" >
+                O_HOME = #{home,jdbcType=DOUBLE},
+            </if>
+            <if test="draw != null" >
+                O_DRAW = #{draw,jdbcType=DOUBLE},
+            </if>
+            <if test="away != null" >
+                O_AWAY = #{away,jdbcType=DOUBLE},
+            </if>
+            <if test="concedePoint != null" >
+                CONCEDE_POINT = #{concedePoint,jdbcType=INTEGER},
+            </if>
+            <if test="home2 != null" >
+                O_HOME_2 = #{home2,jdbcType=DOUBLE},
+            </if>
+            <if test="draw2 != null" >
+                O_DRAW_2 = #{draw2,jdbcType=DOUBLE},
+            </if>
+            <if test="away2 != null" >
+                O_AWAY_2 = #{away2,jdbcType=DOUBLE},
+            </if>
+            <if test="homeBF != null" >
+                O_HOME_BF = #{homeBF,jdbcType=DOUBLE},
+            </if>
+            <if test="drawBF != null" >
+                O_DRAW_BF = #{drawBF,jdbcType=DOUBLE},
+            </if>
+            <if test="awayBF != null" >
+                O_AWAY_BF = #{awayBF,jdbcType=DOUBLE},
+            </if>
+            <if test="publishTime != null" >
+                PUBLISH_TIME = #{publishTime,jdbcType=VARCHAR}
+            </if>
+        </set>
+        WHERE ODDS_ID = #{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertBetAmount" parameterType="aliasBet" >
+        INSERT INTO T_BET_AMOUNT
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="matchNo != null" >
+                MATCH_NO,
+            </if>
+            <if test="homeAmountBetfair != null" >
+                HOME_AMOUNT_BF,
+            </if>
+            <if test="drawAmountBetfair != null" >
+                DRAW_AMOUNT_BF,
+            </if>
+            <if test="awayAmountBetfair != null" >
+                AWAY_AMOUNT_BF,
+            </if>
+            <if test="homeAmountSporttery != null" >
+                HOME_AMOUNT_ST,
+            </if>
+            <if test="drawAmountSporttery != null" >
+                DRAW_AMOUNT_ST,
+            </if>
+            <if test="awayAmountSporttery != null" >
+                AWAY_AMOUNT_ST,
+            </if>
+            <if test="publishTime != null" >
+                PUBLISH_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="matchNo != null" >
+                #{matchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="homeAmountBetfair != null" >
+                #{homeAmountBetfair,jdbcType=DOUBLE},
+            </if>
+            <if test="drawAmountBetfair != null" >
+                #{drawAmountBetfair,jdbcType=DOUBLE},
+            </if>
+            <if test="awayAmountBetfair != null" >
+                #{awayAmountBetfair,jdbcType=DOUBLE},
+            </if>
+            <if test="homeAmountSporttery != null" >
+                #{homeAmountSporttery,jdbcType=DOUBLE},
+            </if>
+            <if test="drawAmountSporttery != null" >
+                #{drawAmountSporttery,jdbcType=DOUBLE},
+            </if>
+            <if test="awayAmountSporttery != null" >
+                #{awayAmountSporttery,jdbcType=DOUBLE},
+            </if>
+            <if test="publishTime != null" >
+                #{publishTime,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <!--<delete id="deleteDuplicateData" >
+
+        DELETE FROM T_ODDS WHERE ODDS_ID IN (
+            SELECT RESULT.ODDS_ID
+            FROM (
+                SELECT
+                    TMP.ODDS_ID,TMP.MATCH_NO,TMP.O_HOME,TMP.O_DRAW,TMP.O_AWAY,TMP.CONCEDE_POINT,TMP.O_HOME_2,TMP.O_DRAW_2,TMP.O_AWAY_2,
+                    @ROWNUM:=@ROWNUM+1 AS ROWNUM ,
+                    IF(@MATCHNO=TMP.MATCH_NO,@RANK:=@RANK+1,@RANK:=1) AS RANK,
+                    @MATCHNO:=TMP.MATCH_NO
+                FROM
+                  (SELECT O.* FROM T_ODDS O ORDER BY MATCH_NO,ODDS_ID ASC ) TMP ,
+                  (SELECT @ROWNUM :=0 , @MATCHNO := NULL ,@RANK:=0) A
+            ) RESULT
+            WHERE RESULT.RANK > 1
+        )
+
+    </delete>-->
+
+    <!-- unused -->
+    <delete id="deleteDuplicateData" >
+        DELETE O.*
+        FROM T_ODDS O,
+        (SELECT MIN(ODDS_ID) ID
+        FROM T_ODDS
+        GROUP BY MATCH_NO,O_HOME,O_DRAW,O_AWAY,CONCEDE_POINT,O_HOME_2,O_DRAW_2,O_AWAY_2
+        ) T
+        WHERE O.ODDS_ID &lt;&gt; T.ID;
+    </delete>
+
+    <!--<update id="removeDuplicateData" resultType="java.lang.Integer" parameterType="java.util.HashMap" statementType="CALLABLE">
+
+        {call remove_duplicate_data(#{before_time,mode=IN,jdbcType=VARCHAR},#{after_time,mode=IN,jdbcType=VARCHAR},#{num,mode=OUT,jdbcType=INTEGER})}
+
+    </update>-->
+
+    <select id="checkIfLatestOdds" parameterType="aliasOdds" resultMap="OddsResultMap">
+        SELECT <include refid="base_cols_odds"/>
+        FROM T_ODDS
+        WHERE odds_id = (select max(a.odds_id) from t_odds a where a.MATCH_NO = #{matchNo} )
+        <if test="matchNo != null" >
+            AND MATCH_NO = #{matchNo,jdbcType=VARCHAR}
+        </if>
+        <if test="home != null" >
+            AND O_HOME =#{home,jdbcType=DOUBLE}
+        </if>
+        <if test="draw != null" >
+            AND O_draw =#{draw,jdbcType=DOUBLE}
+        </if>
+        <if test="away != null" >
+            AND O_away =#{away,jdbcType=DOUBLE}
+        </if>
+        <if test="concedePoint != null" >
+            AND CONCEDE_POINT=#{concedePoint,jdbcType=INTEGER}
+        </if>
+        <if test="home2 != null" >
+            AND O_HOME_2 =#{home2,jdbcType=DOUBLE}
+        </if>
+        <if test="draw2 != null" >
+            AND O_draw_2 =#{draw2,jdbcType=DOUBLE}
+        </if>
+        <if test="away2 != null" >
+            AND O_away_2 =#{away2,jdbcType=DOUBLE}
+        </if>
+    </select>
+
+    <select id="findLatestOddsByMatchNo" parameterType="java.lang.String" resultMap="OddsResultMap">
+        SELECT o.*
+        FROM T_ODDS o
+        join
+            (select max(a.odds_id) odds_id from t_odds a where a.MATCH_NO = #{matchNo} ) b
+        ON o.odds_id=b.odds_id
+    </select>
+    <select id="findLatestMatchByMatchOrder" parameterType="java.lang.String" resultMap="MatchResultMap">
+        SELECT m.*
+        FROM T_MATCH m
+        join
+            (select match_id from T_MATCH a where a.MATCH_ORDER = #{matchOrder} order by start_time desc limit 0,1) b
+        ON m.match_id=b.match_id
+    </select>
+    <select id="selectBetAmount" parameterType="aliasBet" resultMap="BetResultMap">
+        SELECT <include refid="base_cols_bet_amount"/>
+        FROM T_BET_AMOUNT B
+        where match_no= #{matchNo,jdbcType=VARCHAR}
+        <if test="homeAmountBetfair != null" >
+           AND HOME_AMOUNT_BF = #{homeAmountBetfair,jdbcType=DOUBLE}
+        </if>
+        <if test="drawAmountBetfair != null" >
+            AND DRAW_AMOUNT_BF = #{drawAmountBetfair,jdbcType=DOUBLE}
+        </if>
+        <if test="awayAmountBetfair != null" >
+            AND AWAY_AMOUNT_BF = #{awayAmountBetfair,jdbcType=DOUBLE}
+        </if>
+        <if test="homeAmountSporttery != null" >
+            AND HOME_AMOUNT_ST = #{homeAmountSporttery,jdbcType=DOUBLE}
+        </if>
+        <if test="drawAmountSporttery != null" >
+            AND DRAW_AMOUNT_ST = #{drawAmountSporttery,jdbcType=DOUBLE}
+        </if>
+        <if test="awayAmountSporttery != null" >
+            AND AWAY_AMOUNT_ST = #{awayAmountSporttery,jdbcType=DOUBLE}
+        </if>
+
+    </select>
+
+    <select id="selectAllNoBetMatches" parameterType="aliasMatch" resultMap="MatchResultMap">
+        SELECT m.*
+        FROM T_MATCH m
+        WHERE m.match_no_okooo is not null and not exists (select 1 from t_bet_amount b where b.match_no = m.match_no)
+    </select>
+
+</mapper>

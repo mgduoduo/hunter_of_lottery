@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+			    			http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+		>
+
+	<!-- 定时装置所要执行的任务所在的类 -->
+	<bean id="scanAndStoreDataJob" class="com.hunter.quartz.ScanAndStoreDataJob"/>
+
+	<!-- 线程执行器配置，用于任务注册 -->
+	<bean id="executor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="100" />
+		<property name="queueCapacity" value="500" />
+	</bean>
+
+	<!-- 引用任务描述 -->
+	<bean id="methodInvokingJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 引用任务方法所在的类 -->
+		<property name="targetObject" ref="scanAndStoreDataJob"/>
+		<!-- 指定任务方法名称 -->
+		<property name="targetMethod" value="invoke"/>
+	</bean>
+	<bean id="syncMatchHistoryJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 引用任务方法所在的类 -->
+		<property name="targetObject" ref="scanAndStoreDataJob"/>
+		<!-- 指定任务方法名称 -->
+		<property name="targetMethod" value="syncMatchHistory"/>
+	</bean>
+
+	<!-- 配置触发器 -->
+	<bean id="scanTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<!-- 这里不可以直接在属性jobDetail中引用taskJob，因为他要求的是一个jobDetail类型的对象，所以我们得通过MethodInvokingJobDetailFactoryBean来转一下 -->
+		<!-- 引用任务描述bean -->
+		<property name="jobDetail" ref="methodInvokingJobDetail"/>
+
+		<!-- 指定时间触发 -->
+		<property name="cronExpression">
+			<!-- 秒 分 时 日 月 周 年 -->
+			<value>0 0/5 00,01,11,12,16,17,18,19,20,21,22,23 * * ?</value>
+		</property>
+	</bean>
+	<!-- 配置触发器 -->
+	<bean id="syncTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<!-- 这里不可以直接在属性jobDetail中引用taskJob，因为他要求的是一个jobDetail类型的对象，所以我们得通过MethodInvokingJobDetailFactoryBean来转一下 -->
+		<!-- 引用任务描述bean -->
+		<property name="jobDetail" ref="syncMatchHistoryJobDetail"/>
+
+		<!-- 指定时间触发 -->
+		<property name="cronExpression">
+			<!-- 秒 分 时 日 月 周 年 -->
+			<value>0 0 14 * * ?</value>
+		</property>
+	</bean>
+
+	<!-- 配置任务工厂, 只能有一个这种bean -->
+	<bean id="schedulerFactory" lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<!-- 添加触发器 -->
+		<property name="triggers">
+			<list>
+				<ref local="scanTrigger" />
+				<ref local="syncTrigger" />
+			</list>
+		</property>
+		<property name="taskExecutor" ref="executor" />
+	</bean>
+</beans>

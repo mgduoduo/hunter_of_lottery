@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunter.mapper.LeagueMapper" >
+
+    <resultMap id="LeagueResultMap" type="aliasLeague">
+        <id property="id" column="LEAGUE_ID" />
+        <result property="leagueNo" column="LEAGUE_NO" />
+        <result property="leagueName" column="LEAGUE_NAME" />
+        <result property="leagueShortName" column="LEAGUE_SHORT_NAME" />
+        <result property="country" column="COUNTRY" />
+    </resultMap>
+
+    <resultMap id="ClubResultMap" type="aliasClub" >
+        <id property="id" column="CLUB_ID" />
+        <result property="clubNo" column="CLUB_NO" />
+        <result property="clubName" column="CLUB_NAME" />
+        <result property="clubShortName" column="CLUB_SHORT_NAME" />
+        <result property="leagueRanking" column="LEAGUE_RANKING" />
+        <!-- 关联表 -->
+        <!--<result property="leagueNo" column="LEAGUE_NO" />-->
+        <association property="league" resultMap="LeagueResultMap" />
+    </resultMap>
+
+
+    <sql id="base_cols_league">
+          LEAGUE_ID,LEAGUE_NO,LEAGUE_NAME,LEAGUE_SHORT_NAME,COUNTRY
+     </sql>
+    <sql id="base_cols_club">
+        CLUB_ID,CLUB_NO,CLUB_NAME,CLUB_SHORT_NAME,LEAGUE_RANKING,LEAGUE_NO
+    </sql>
+    <!--<select id="listAll" resultType="com.hunter.bean.Match">
+        select
+            <include refid="cols"/>
+        from   t_match
+    </select>
+
+    <select id="getOne" parameterType="string" resultType="aliasesUser">
+        select <include refid="cols"/> from   t_match  where id= #{id}
+    </select>-->
+
+
+    <!-- League-->
+
+    <insert id="insertLeague" parameterType="aliasLeague" >
+        INSERT INTO T_LEAGUE
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="leagueNo != null" >
+                LEAGUE_NO,
+            </if>
+            <if test="leagueName != null" >
+                LEAGUE_NAME,
+            </if>
+            <if test="leagueShortName != null" >
+                LEAGUE_SHORT_NAME,
+            </if>
+            <if test="country != null" >
+                COUNTRY,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="leagueNo != null" >
+                #{leagueNo,jdbcType=VARCHAR},
+            </if>
+            <if test="leagueName != null" >
+                #{leagueName,jdbcType=VARCHAR},
+            </if>
+            <if test="leagueShortName != null" >
+                #{leagueShortName,jdbcType=VARCHAR},
+            </if>
+            <if test="country != null" >
+                #{country,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+     <update id="updateLeague" parameterType="aliasLeague" >
+         UPDATE T_LEAGUE
+         <set >
+             <if test="id != null" >
+                 LEAGUE_ID=#{id,jdbcType=INTEGER},
+             </if>
+             <if test="leagueNo != null" >
+                 LEAGUE_NO = #{leagueNo,jdbcType=VARCHAR},
+             </if>
+             <if test="leagueName != null" >
+                 LEAGUE_NAME = #{leagueName,jdbcType=VARCHAR},
+             </if>
+             <if test="leagueShortName != null" >
+                 LEAGUE_SHORT_NAME = #{leagueShortName,jdbcType=VARCHAR},
+             </if>
+             <if test="country != null" >
+                 COUNTRY = #{country,jdbcType=VARCHAR},
+             </if>
+         </set>
+         WHERE LEAGUE_ID=#{id,jdbcType=INTEGER}
+     </update>
+
+     <delete id="deleteLeague" parameterType="aliasLeague" >
+         DELETE FROM T_LEAGUE
+         WHERE LEAGUE_ID= #{id}
+     </delete>
+    <select id="selectLeagueById" parameterType="java.lang.Integer" resultMap="LeagueResultMap">
+        SELECT <include refid="base_cols_league"/> FROM T_LEAGUE  WHERE LEAGUE_ID= #{id}
+    </select>
+
+
+
+    <!-- Club-->
+    <insert id="insertClub" parameterType="aliasClub" >
+        INSERT INTO T_CLUB(CLUB_NO,CLUB_NAME,CLUB_SHORT_NAME,LEAGUE_NO,LEAGUE_RANKING )
+        VALUES (#{clubNo},#{clubName},#{clubShortName},#{leagueNo},#{leagueRanking})
+    </insert>
+
+    <update id="updateClub" parameterType="aliasClub" >
+        UPDATE T_CLUB
+        <set >
+            <if test="id != null" >
+                CLUB_ID=#{id,jdbcType=INTEGER},
+            </if>
+            <if test="clubNo != null" >
+                CLUB_NO = #{clubNo,jdbcType=VARCHAR},
+            </if>
+            <if test="clubName != null" >
+                CLUB_NAME = #{clubName,jdbcType=VARCHAR},
+            </if>
+            <if test="clubShortName != null" >
+                CLUB_SHORT_NAME = #{clubShortName,jdbcType=VARCHAR},
+            </if>
+            <if test="leagueRanking != null" >
+                LEAGUE_RANKING = #{leagueRanking,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE CLUB_ID=#{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteClub" parameterType="aliasClub" >
+        DELETE FROM T_CLUB WHERE CLUB_ID= #{id}
+    </delete>
+    <select id="selectClubById" parameterType="java.lang.Integer" resultMap="ClubResultMap">
+        SELECT CLUB_ID,CLUB_NO,CLUB_NAME,CLUB_SHORT_NAME,LEAGUE_RANKING FROM T_CLUB WHERE CLUB_ID= #{id}
+    </select>
+
+    <select id="selectClubByNo" parameterType="java.lang.String" resultMap="ClubResultMap">
+        SELECT CLUB_ID,CLUB_NO,CLUB_NAME,CLUB_SHORT_NAME,LEAGUE_RANKING FROM T_CLUB WHERE CLUB_NO= #{clubNo}
+    </select>
+
+    <select id="selectClub" parameterType="aliasClub" resultMap="ClubResultMap">
+        SELECT CLUB_ID,CLUB_NO,CLUB_NAME,CLUB_SHORT_NAME,LEAGUE_RANKING
+        FROM T_CLUB TC
+        left join T_LEAGUE TL
+        ON TC.LEAGUE_NO=TL.LEAGUE_NO
+        WHERE 1=1
+        <if test="id != null" >
+            AND CLUB_ID=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="clubNo != null" >
+            AND CLUB_NO = #{clubNo,jdbcType=VARCHAR}
+        </if>
+        <if test="clubName != null" >
+            AND CLUB_NAME = #{clubName,jdbcType=VARCHAR}
+        </if>
+        <if test="clubShortName != null" >
+            AND CLUB_SHORT_NAME = #{clubShortName,jdbcType=VARCHAR}
+        </if>
+        <if test="leagueRanking != null" >
+            AND LEAGUE_RANKING = #{leagueRanking,jdbcType=VARCHAR}
+        </if>
+        <if test="leagueNo != null" >
+            AND LEAGUE_NO = #{leagueNo,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
+    <select id="selectLeague" parameterType="java.util.Map" resultMap="LeagueResultMap">
+        SELECT <include refid="base_cols_league"/>
+        FROM T_LEAGUE
+        WHERE 1=1
+        <if test="leagueNo != null" >
+        AND LEAGUE_NO= #{leagueNo,jdbcType=VARCHAR}
+        </if>
+        <if test="country != null" >
+        AND COUNTRY=#{country,jdbcType=VARCHAR}
+        </if>
+        order by LEAGUE_NO asc
+    </select>
+
+    <select id="selectAllClubsByLeagueNo" parameterType="java.lang.String" resultMap="ClubResultMap">
+        SELECT TC.CLUB_ID,TC.CLUB_NO,TC.CLUB_NAME,TC.CLUB_SHORT_NAME,TC.LEAGUE_RANKING,TL.LEAGUE_NO
+        FROM T_CLUB TC
+        LEFT JOIN T_LEAGUE TL
+        ON TC.LEAGUE_NO = TL.LEAGUE_NO
+        WHERE TL.LEAGUE_NO= #{leagueNo,jdbcType=VARCHAR}
+        ORDER BY TC.LEAGUE_RANKING ASC
+    </select>
+    <select id="selectAllLeagues" parameterType="java.lang.String" resultMap="LeagueResultMap">
+        SELECT <include refid="base_cols_league"/>
+        FROM T_LEAGUE
+        WHERE 1=1
+        <if test="country != null" >
+            AND COUNTRY=#{country,jdbcType=VARCHAR}
+        </if>
+    </select>
+    <select id="selectAllNoClubLeagues" resultMap="LeagueResultMap">
+        SELECT <include refid="base_cols_league"/>
+        FROM T_LEAGUE L
+        WHERE NOT EXISTS (SELECT 1 FROM T_CLUB TC WHERE L.LEAGUE_NO=TC.LEAGUE_NO )
+        AND  L.COUNTRY &lt;&gt; '' AND LOCATE('杯', L.LEAGUE_NAME)=0
+
+    </select>
+
+</mapper>
